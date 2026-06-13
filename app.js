@@ -41,15 +41,11 @@ function switchView(viewName) {
   mapView.classList.toggle('active-view', !isLevel);
 
   if (!isLevel) {
-    // 等容器完全显示后再初始化地图
-    setTimeout(function() {
-      initMap();
-    }, 300);
+    setTimeout(function() { initMap(); }, 300);
   }
 }
 
 function initMap() {
-  // 已初始化则刷新尺寸即可
   if (state.leafletMap) {
     state.leafletMap.invalidateSize();
     return;
@@ -67,18 +63,16 @@ function initMap() {
 
   state.leafletMap = map;
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+    attribution: '高德地图',
+    subdomains: ['1', '2', '3', '4'],
     maxZoom: 18
   }).addTo(map);
 
   addMarkers(map);
   updateMapLegend();
 
-  // 二次刷新确保手机端正确渲染
-  setTimeout(function() {
-    map.invalidateSize();
-  }, 400);
+  setTimeout(function() { map.invalidateSize(); }, 400);
 }
 
 function addMarkers(map) {
@@ -93,13 +87,7 @@ function addMarkers(map) {
     var color = unlocked ? colors[food.id] : '#9a948b';
 
     food.stores.forEach(function(store) {
-      var markerHtml = '<div style="'
-        + 'width:36px;height:36px;border-radius:50%;'
-        + 'background:' + color + ';border:3px solid #fff;'
-        + 'box-shadow:0 3px 10px rgba(0,0,0,0.25);'
-        + 'display:flex;align-items:center;justify-content:center;'
-        + 'font-size:17px;'
-        + '">' + food.emoji + '</div>';
+      var markerHtml = '<div style="width:36px;height:36px;border-radius:50%;background:' + color + ';border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;font-size:17px;">' + food.emoji + '</div>';
 
       var icon = L.divIcon({
         html: markerHtml,
@@ -109,13 +97,8 @@ function addMarkers(map) {
         popupAnchor: [0, -38]
       });
 
-      var phoneRow = store.phone
-        ? '<div class="popup-row"><span class="popup-label">电话：</span>' + store.phone + '</div>'
-        : '';
-
-      var lockedTip = !unlocked
-        ? '<div class="popup-locked">完成"' + food.name + '"闯关后可解锁高亮显示</div>'
-        : '';
+      var phoneRow = store.phone ? '<div class="popup-row"><span class="popup-label">电话：</span>' + store.phone + '</div>' : '';
+      var lockedTip = !unlocked ? '<div class="popup-locked">完成"' + food.name + '"闯关后可解锁高亮显示</div>' : '';
 
       var popupHtml = '<div class="popup-name">' + store.name + '</div>'
         + '<div class="popup-row"><span class="popup-label">分类：</span>' + food.name + '</div>'
@@ -133,25 +116,13 @@ function addMarkers(map) {
 
 function updateMapLegend() {
   var unlockedCount = state.unlockedFoodIds.length;
-  mapLegend.innerHTML = '已解锁 ' + unlockedCount + ' / ' + foods.length + ' 类美食高亮点位。'
-    + '&nbsp;🟤 桲椤叶饼&nbsp;&nbsp;🔵 山海关冰糕&nbsp;&nbsp;🟡 花生糕<br>'
-    + '灰色标记表示未通关，点击仍可查看门店详细信息。';
+  mapLegend.innerHTML = '已解锁 ' + unlockedCount + ' / ' + foods.length + ' 类美食高亮点位。&nbsp;🟤 桲椤叶饼&nbsp;&nbsp;🔵 山海关冰糕&nbsp;&nbsp;🟡 花生糕<br>灰色标记表示未通关，点击仍可查看门店详细信息。';
 }
 
 function renderFoodCards() {
   foodCards.innerHTML = foods.map(function(food) {
     var unlocked = state.unlockedFoodIds.indexOf(food.id) !== -1;
-    return '<article class="food-card">'
-      + '<div class="food-image">' + food.emoji + '<br>' + food.coverText + '</div>'
-      + '<div>'
-      + '<h3>' + food.name + '</h3>'
-      + '<p>' + food.intro + '</p>'
-      + '<div class="card-actions">'
-      + '<span class="status-pill ' + (unlocked ? 'done' : '') + '">' + (unlocked ? '已通关' : '未通关') + '</span>'
-      + '<button class="primary-button" type="button" onclick="startChallenge(\'' + food.id + '\')">开始闯关</button>'
-      + '</div>'
-      + '</div>'
-      + '</article>';
+    return '<article class="food-card"><div class="food-image">' + food.emoji + '<br>' + food.coverText + '</div><div><h3>' + food.name + '</h3><p>' + food.intro + '</p><div class="card-actions"><span class="status-pill ' + (unlocked ? 'done' : '') + '">' + (unlocked ? '已通关' : '未通关') + '</span><button class="primary-button" type="button" onclick="startChallenge(\'' + food.id + '\')">开始闯关</button></div></div></article>';
   }).join('');
 }
 
@@ -165,97 +136,55 @@ function startChallenge(foodId) {
 function renderChallenge() {
   var food = getActiveFood();
   if (!food) return;
-
   var step = food.steps[state.currentStepIndex];
   var currentNumber = state.currentStepIndex + 1;
   var total = food.steps.length;
-
   var optionButtons = step.options.map(function(option, index) {
     return '<button class="option-button" type="button" onclick="chooseStep(' + index + ')">' + option + '</button>';
   }).join('');
-
   challengePanel.classList.remove('hidden');
-  challengePanel.innerHTML = '<div class="challenge-head">'
-    + '<div>'
-    + '<h3 class="challenge-title">' + food.name + '制作闯关</h3>'
-    + '<div class="step-progress">第 ' + currentNumber + ' / ' + total + ' 步</div>'
-    + '</div>'
-    + '<button class="text-button" type="button" onclick="hideChallenge()">收起</button>'
-    + '</div>'
-    + '<div class="story-box">'
-    + '<strong>' + step.question + '</strong><br>'
-    + '<span>答对后会弹出食材科普和本地民俗故事，你可以在 data.js 中替换这些预留文案。</span>'
-    + '</div>'
-    + '<div class="option-list">' + optionButtons + '</div>';
+  challengePanel.innerHTML = '<div class="challenge-head"><div><h3 class="challenge-title">' + food.name + '制作闯关</h3><div class="step-progress">第 ' + currentNumber + ' / ' + total + ' 步</div></div><button class="text-button" type="button" onclick="hideChallenge()">收起</button></div><div class="story-box"><strong>' + step.question + '</strong><br><span>答对后会弹出食材科普和本地民俗故事，你可以在 data.js 中替换这些预留文案。</span></div><div class="option-list">' + optionButtons + '</div>';
 }
 
 function chooseStep(optionIndex) {
   var food = getActiveFood();
   var step = food.steps[state.currentStepIndex];
   var option = step.options[optionIndex];
-  var optionButtons = challengePanel.querySelectorAll('.option-button');
-  var selectedButton = optionButtons[optionIndex];
-
+  var btns = challengePanel.querySelectorAll('.option-button');
   if (option === step.correct) {
-    selectedButton.classList.add('correct');
+    btns[optionIndex].classList.add('correct');
     showStepInfo(food, step);
     return;
   }
-
-  selectedButton.classList.add('wrong');
-  openModal('<h3>再想一想</h3>'
-    + '<p>' + step.wrongTip + '</p>'
-    + '<button class="small-button" type="button" onclick="closeModal()">继续选择</button>');
+  btns[optionIndex].classList.add('wrong');
+  openModal('<h3>再想一想</h3><p>' + step.wrongTip + '</p><button class="small-button" type="button" onclick="closeModal()">继续选择</button>');
 }
 
 function showStepInfo(food, step) {
-  var isLastStep = state.currentStepIndex === food.steps.length - 1;
-  openModal('<h3>' + (isLastStep ? '本关完成前的科普' : '答对啦') + '</h3>'
-    + '<div class="info-line"><strong>食材科普：</strong>' + step.science + '</div>'
-    + '<div class="info-line"><strong>本地民俗小故事：</strong>' + step.folkTip + '</div>'
-    + '<button class="small-button" type="button" onclick="goNextStep()">'
-    + (isLastStep ? '完成本关' : '进入下一步') + '</button>');
+  var isLast = state.currentStepIndex === food.steps.length - 1;
+  openModal('<h3>' + (isLast ? '本关完成前的科普' : '答对啦') + '</h3><div class="info-line"><strong>食材科普：</strong>' + step.science + '</div><div class="info-line"><strong>本地民俗小故事：</strong>' + step.folkTip + '</div><button class="small-button" type="button" onclick="goNextStep()">' + (isLast ? '完成本关' : '进入下一步') + '</button>');
 }
 
 function goNextStep() {
   closeModal();
   var food = getActiveFood();
-  var isLastStep = state.currentStepIndex === food.steps.length - 1;
-
-  if (isLastStep) {
+  var isLast = state.currentStepIndex === food.steps.length - 1;
+  if (isLast) {
     unlockFood(food.id);
-    openModal('<h3>' + food.name + '通关成功</h3>'
-      + '<p>' + food.unlockText + '</p>'
-      + '<button class="small-button" type="button" onclick="closeModal(); switchView(\'map\')">去地图看看</button>');
+    openModal('<h3>' + food.name + '通关成功</h3><p>' + food.unlockText + '</p><button class="small-button" type="button" onclick="closeModal(); switchView(\'map\')">去地图看看</button>');
     challengePanel.classList.add('hidden');
     renderFoodCards();
-    if (state.leafletMap) {
-      state.leafletMap.remove();
-      state.leafletMap = null;
-    }
+    if (state.leafletMap) { state.leafletMap.remove(); state.leafletMap = null; }
     return;
   }
-
   state.currentStepIndex += 1;
   renderChallenge();
 }
 
-function hideChallenge() {
-  challengePanel.classList.add('hidden');
-}
-
-function openModal(html) {
-  modalContent.innerHTML = html;
-  infoModal.classList.remove('hidden');
-}
-
-function closeModal() {
-  infoModal.classList.add('hidden');
-}
-
-function getActiveFood() {
-  return foods.find(function(food) { return food.id === state.activeFoodId; });
-}
+function hideChallenge() { challengePanel.classList.add('hidden'); }
+function openModal(html) { modalContent.innerHTML = html; infoModal.classList.remove('hidden'); }
+function closeModal() { infoModal.classList.add('hidden'); }
+function getActiveFood() { return foods.find(function(f) { return f.id === state.activeFoodId; }); }
 
 function unlockFood(foodId) {
   if (state.unlockedFoodIds.indexOf(foodId) === -1) {
@@ -265,11 +194,7 @@ function unlockFood(foodId) {
 }
 
 function loadProgress() {
-  try {
-    return JSON.parse(localStorage.getItem(progressKey)) || [];
-  } catch (e) {
-    return [];
-  }
+  try { return JSON.parse(localStorage.getItem(progressKey)) || []; } catch (e) { return []; }
 }
 
 function saveProgress() {
@@ -281,11 +206,6 @@ function resetProgress() {
   localStorage.removeItem(progressKey);
   renderFoodCards();
   hideChallenge();
-  if (state.leafletMap) {
-    state.leafletMap.remove();
-    state.leafletMap = null;
-  }
-  openModal('<h3>进度已重置</h3>'
-    + '<p>三个美食点位已恢复为未通关状态，地图图标会重新置灰。</p>'
-    + '<button class="small-button" type="button" onclick="closeModal()">好的</button>');
+  if (state.leafletMap) { state.leafletMap.remove(); state.leafletMap = null; }
+  openModal('<h3>进度已重置</h3><p>三个美食点位已恢复为未通关状态，地图图标会重新置灰。</p><button class="small-button" type="button" onclick="closeModal()">好的</button>');
 }
