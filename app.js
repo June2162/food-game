@@ -1,6 +1,5 @@
 /*
   山海关乡土美食科普小游戏主逻辑
-  给非计算机专业队员的修改提示：页面文字和门店信息主要在 data.js 修改。
 */
 
 const foods = window.FOOD_GAME_DATA;
@@ -14,8 +13,10 @@ const state = {
 };
 
 const levelTab = document.getElementById('levelTab');
+const cookTab = document.getElementById('cookTab');
 const mapTab = document.getElementById('mapTab');
 const levelView = document.getElementById('levelView');
+const cookView = document.getElementById('cookView');
 const mapView = document.getElementById('mapView');
 const foodCards = document.getElementById('foodCards');
 const challengePanel = document.getElementById('challengePanel');
@@ -34,13 +35,14 @@ resetProgressButton.addEventListener('click', resetProgress);
 renderFoodCards();
 
 function switchView(viewName) {
-  var isLevel = viewName === 'level';
-  levelTab.classList.toggle('active', isLevel);
-  mapTab.classList.toggle('active', !isLevel);
-  levelView.classList.toggle('active-view', isLevel);
-  mapView.classList.toggle('active-view', !isLevel);
+  levelTab.classList.toggle('active', viewName === 'level');
+  cookTab.classList.toggle('active', viewName === 'cook');
+  mapTab.classList.toggle('active', viewName === 'map');
+  levelView.classList.toggle('active-view', viewName === 'level');
+  cookView.classList.toggle('active-view', viewName === 'cook');
+  mapView.classList.toggle('active-view', viewName === 'map');
 
-  if (!isLevel) {
+  if (viewName === 'map') {
     setTimeout(function() { initMap(); }, 300);
   }
 }
@@ -71,7 +73,6 @@ function initMap() {
 
   addMarkers(map);
   updateMapLegend();
-
   setTimeout(function() { map.invalidateSize(); }, 400);
 }
 
@@ -143,7 +144,7 @@ function renderChallenge() {
     return '<button class="option-button" type="button" onclick="chooseStep(' + index + ')">' + option + '</button>';
   }).join('');
   challengePanel.classList.remove('hidden');
-  challengePanel.innerHTML = '<div class="challenge-head"><div><h3 class="challenge-title">' + food.name + '制作闯关</h3><div class="step-progress">第 ' + currentNumber + ' / ' + total + ' 步</div></div><button class="text-button" type="button" onclick="hideChallenge()">收起</button></div><div class="story-box"><strong>' + step.question + '</strong><br><span>答对后会弹出食材科普和本地民俗故事，你可以在 data.js 中替换这些预留文案。</span></div><div class="option-list">' + optionButtons + '</div>';
+  challengePanel.innerHTML = '<div class="challenge-head"><div><h3 class="challenge-title">' + food.name + '制作闯关</h3><div class="step-progress">第 ' + currentNumber + ' / ' + total + ' 步</div></div><button class="text-button" type="button" onclick="hideChallenge()">收起</button></div><div class="story-box"><strong>' + step.question + '</strong><br><span>答对后会弹出食材科普和本地民俗故事。</span></div><div class="option-list">' + optionButtons + '</div>';
 }
 
 function chooseStep(optionIndex) {

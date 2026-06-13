@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="format-detection" content="telephone=no" />
   <title>山海关乡土美食科普小游戏</title>
-  <!-- Leaflet CSS - 使用 jsDelivr 国内加速节点 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
   <link rel="stylesheet" href="./style.css" />
 </head>
@@ -17,8 +16,9 @@
       <p class="hero-desc">认识桲椤叶饼、山海关冰糕、花生糕，在轻量闯关和地图浏览中了解秦皇岛地方小吃文化。</p>
     </header>
 
-    <nav class="top-tabs" aria-label="游戏模块切换">
-      <button id="levelTab" class="tab-button active" type="button">美食闯关</button>
+    <nav class="top-tabs three-tabs" aria-label="游戏模块切换">
+      <button id="levelTab" class="tab-button active" type="button">知识闯关</button>
+      <button id="cookTab" class="tab-button" type="button">互动制作</button>
       <button id="mapTab" class="tab-button" type="button">美食地图</button>
     </nav>
 
@@ -32,6 +32,40 @@
       </div>
       <div id="foodCards" class="food-card-list"></div>
       <article id="challengePanel" class="challenge-panel hidden"></article>
+    </section>
+
+    <section id="cookView" class="view" aria-label="互动制作模块">
+      <div class="section-title-row">
+        <div>
+          <p class="section-kicker">Interactive Cooking</p>
+          <h2>拖动食材体验制作</h2>
+        </div>
+      </div>
+      <p class="map-tip">选择一款美食，按正确顺序将食材拖动到制作台上，体验传统制作工艺。</p>
+      
+      <div id="cookFoodSelect" class="cook-food-select"></div>
+      
+      <div id="cookingArea" class="cooking-area hidden">
+        <div class="cooking-header">
+          <h3 id="cookingTitle">制作中...</h3>
+          <div id="cookingProgress" class="cooking-progress">步骤 1 / 4</div>
+        </div>
+        
+        <div class="cooking-instruction">
+          <p id="cookingInstruction">请将正确的食材拖到制作台上</p>
+        </div>
+        
+        <div id="dropZone" class="drop-zone">
+          <div class="drop-zone-inner">
+            <span class="drop-icon">🍳</span>
+            <span class="drop-text">拖动食材到这里</span>
+          </div>
+        </div>
+        
+        <div id="ingredientList" class="ingredient-list"></div>
+        
+        <div id="completedSteps" class="completed-steps"></div>
+      </div>
     </section>
 
     <section id="mapView" class="view" aria-label="美食地图模块">
@@ -55,9 +89,9 @@
     </div>
   </div>
 
-  <!-- Leaflet JS - 使用 jsDelivr 国内加速节点 -->
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
   <script src="./data.js"></script>
   <script src="./app.js"></script>
+  <script src="./cook.js"></script>
 </body>
 </html>
