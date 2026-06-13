@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>山海关乡土美食科普小游戏</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="phone-shell">
+    <header class="hero-card">
+      <p class="eyebrow">大学生“三下乡”乡土文化宣传</p>
+      <h1>山海关乡土美食小课堂</h1>
+      <p class="hero-desc">认识桲椤叶饼、山海关冰糕、花生糕，在轻量闯关和地图浏览中了解秦皇岛地方小吃文化。</p>
+    </header>
+
+    <nav class="top-tabs" aria-label="游戏模块切换">
+      <button id="levelTab" class="tab-button active" type="button">美食闯关</button>
+      <button id="mapTab" class="tab-button" type="button">美食地图</button>
+    </nav>
+
+    <section id="levelView" class="view active-view" aria-label="美食闯关模块">
+      <div class="section-title-row">
+        <div>
+          <p class="section-kicker">Food Challenge</p>
+          <h2>选择一种小吃开始闯关</h2>
+        </div>
+        <button id="resetProgressButton" class="text-button" type="button">重置进度</button>
+      </div>
+      <div id="foodCards" class="food-card-list"></div>
+      <article id="challengePanel" class="challenge-panel hidden"></article>
+    </section>
+
+    <section id="mapView" class="view" aria-label="美食地图模块">
+      <div class="section-title-row">
+        <div>
+          <p class="section-kicker">Food Map</p>
+          <h2>山海关美食区位图</h2>
+        </div>
+      </div>
+      <p class="map-tip">地图支持纯浏览。未通关点位会置灰，但仍可点击查看门店信息，方便社区、学校宣讲使用。</p>
+      <div class="simple-map" role="img" aria-label="秦皇岛山海关片区简易美食地图">
+        <div class="map-river">山海关片区</div>
+        <div class="map-road road-one"></div>
+        <div class="map-road road-two"></div>
+        <div class="map-label label-gate">山海关古城</div>
+        <div class="map-label label-station">火车站方向</div>
+        <div class="map-label label-sea">渤海方向</div>
+        <div id="mapMarkers"></div>
+      </div>
+      <div id="mapLegend" class="map-legend"></div>
+    </section>
+  </main>
+
+  <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-mask"></div>
+    <div class="modal-card">
+      <button id="closeModalButton" class="modal-close" type="button" aria-label="关闭弹窗">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
