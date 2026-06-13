@@ -3,8 +3,7 @@
 
   给非计算机专业队员的修改提示：
   - 页面文字和门店信息主要在 data.js 修改。
-  - 本文件主要负责按钮点击、闯关判断、地图高亮和弹窗显示。
-  - 不需要改动复杂框架，也没有引入付费插件。
+  - 本文件主要负责按钮点击、闯关判断、地图渲染和弹窗显示。
 */
 
 const foods = window.FOOD_GAME_DATA;
@@ -13,7 +12,8 @@ const progressKey = 'qinhuangdao_food_game_unlocked';
 const state = {
   activeFoodId: null,
   currentStepIndex: 0,
-  unlockedFoodIds: loadProgress()
+  unlockedFoodIds: loadProgress(),
+  leafletMap: null
 };
 
 const levelTab = document.getElementById('levelTab');
@@ -22,7 +22,6 @@ const levelView = document.getElementById('levelView');
 const mapView = document.getElementById('mapView');
 const foodCards = document.getElementById('foodCards');
 const challengePanel = document.getElementById('challengePanel');
-const mapMarkers = document.getElementById('mapMarkers');
 const mapLegend = document.getElementById('mapLegend');
 const infoModal = document.getElementById('infoModal');
 const modalContent = document.getElementById('modalContent');
@@ -36,7 +35,6 @@ infoModal.querySelector('.modal-mask').addEventListener('click', closeModal);
 resetProgressButton.addEventListener('click', resetProgress);
 
 renderFoodCards();
-renderMap();
 
 function switchView(viewName) {
   const isLevel = viewName === 'level';
@@ -44,6 +42,98 @@ function switchView(viewName) {
   mapTab.classList.toggle('active', !isLevel);
   levelView.classList.toggle('active-view', isLevel);
   mapView.classList.toggle('active-view', !isLevel);
+
+  if (!isLevel) {
+    initMap();
+  }
+}
+
+function initMap() {
+  if (state.leafletMap) {
+    state.leafletMap.remove();
+    state.leafletMap = null;
+  }
+
+  const map = L.map('realMap', {
+    center: [39.98, 119.69],
+    zoom: 11,
+    zoomControl: true
+  });
+
+  state.leafletMap = map;
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 18
+  }).addTo(map);
+
+  const colors = {
+    boluoye: '#a7442b',
+    icecream: '#3a7abf',
+    peanutcake: '#d7a14b'
+  };
+
+  foods.forEach((food) => {
+    const unlocked = state.unlockedFoodIds.includes(food.id);
+    const color = unlocked ? colors[food.id] : '#9a948b';
+
+    food.stores.forEach((store) => {
+      const markerHtml = `
+        <div style="
+          width:38px; height:38px; border-radius:50%;
+          background:${color}; border:3px solid #fff;
+          box-shadow:0 4px 12px rgba(0,0,0,0.22);
+          display:flex; align-items:center; justify-content:center;
+          font-size:18px; cursor:pointer;
+        ">${food.emoji}</div>
+      `;
+
+      const icon = L.divIcon({
+        html: markerHtml,
+        className: '',
+        iconSize: [38, 38],
+        iconAnchor: [19, 38],
+        popupAnchor: [0, -40]
+      });
+
+      const marker = L.marker([store.lat, store.lng], { icon }).addTo(map);
+
+      const phoneRow = store.phone
+        ? `<div class="popup-row"><span class="popup-label">电话：</span>${store.phone}</div>`
+        : '';
+      const lockedTip = !unlocked
+        ? `<div class="popup-locked">完成"${food.name}"闯关后可解锁高亮显示</div>`
+        : '';
+
+      const popupHtml = `
+        <div class="popup-name">${store.name}</div>
+        <div class="popup-row"><span class="popup-label">分类：</span>${food.name}</div>
+        <div class="popup-row"><span class="popup-label">地址：</span>${store.address}</div>
+        ${phoneRow}
+        <div class="popup-row"><span class="popup-label">营业时间：</span>${store.openTime}</div>
+        <div class="popup-row"><span class="popup-label">区域：</span>${store.area}</div>
+        ${lockedTip}
+      `;
+
+      marker.bindPopup(popupHtml, { maxWidth: 260 });
+    });
+  });
+
+  updateMapLegend();
+
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 100);
+}
+
+function updateMapLegend() {
+  const unlockedCount = state.unlockedFoodIds.length;
+  const total = foods.length;
+  mapLegend.innerHTML = `
+    已解锁 ${unlockedCount} / ${total} 类美食高亮点位。
+    🟤 桲椤叶饼&nbsp;&nbsp;🔵 山海关冰糕&nbsp;&nbsp;🟡 花生糕<br>
+    灰色标记表示未通关，点击仍可查看门店详细信息。
+  `;
 }
 
 function renderFoodCards() {
@@ -91,7 +181,7 @@ function renderChallenge() {
     </div>
     <div class="story-box">
       <strong>${step.question}</strong><br>
-      <span>答对后会弹出食材科普和本地民俗故事。你可以在 data.js 中替换这些预留文案。</span>
+      <span>答对后会弹出食材科普和本地民俗故事，你可以在 data.js 中替换这些预留文案。</span>
     </div>
     <div class="option-list">
       ${step.options.map((option, index) => `
@@ -146,7 +236,6 @@ function goNextStep() {
     `);
     challengePanel.classList.add('hidden');
     renderFoodCards();
-    renderMap();
     return;
   }
 
@@ -156,44 +245,6 @@ function goNextStep() {
 
 function hideChallenge() {
   challengePanel.classList.add('hidden');
-}
-
-function renderMap() {
-  mapMarkers.innerHTML = foods.map((food) => {
-    const unlocked = state.unlockedFoodIds.includes(food.id);
-    return `
-      <button
-        class="map-marker ${unlocked ? '' : 'locked'}"
-        style="left:${food.mapPosition.x}%; top:${food.mapPosition.y}%;"
-        type="button"
-        onclick="showStoreInfo('${food.id}')"
-        aria-label="查看${food.name}门店信息"
-      >
-        ${food.shortName}
-      </button>
-    `;
-  }).join('');
-
-  const unlockedCount = state.unlockedFoodIds.length;
-  mapLegend.innerHTML = `已解锁 ${unlockedCount} / ${foods.length} 个高亮点位。灰色图标表示尚未通关，但仍可点击查看完整门店信息。`;
-}
-
-function showStoreInfo(foodId) {
-  const food = foods.find((item) => item.id === foodId);
-  const unlocked = state.unlockedFoodIds.includes(foodId);
-  const photoContent = food.store.photo
-    ? `<img class="store-photo" src="${food.store.photo}" alt="${food.store.name}实拍图" />`
-    : `<div class="store-photo">${food.store.photoPlaceholder}</div>`;
-
-  openModal(`
-    <h3>${food.store.name}</h3>
-    ${photoContent}
-    <div class="info-line"><strong>解锁状态：</strong>${unlocked ? '已通关，高亮展示' : '未通关，地图置灰但可浏览'}</div>
-    <div class="info-line"><strong>详细地址：</strong>${food.store.address}</div>
-    <div class="info-line"><strong>营业时间：</strong>${food.store.openTime}</div>
-    <div class="info-line"><strong>特色点评：</strong>${food.store.comment}</div>
-    <button class="small-button" type="button" onclick="closeModal()">我知道了</button>
-  `);
 }
 
 function openModal(html) {
@@ -232,8 +283,11 @@ function resetProgress() {
   state.unlockedFoodIds = [];
   localStorage.removeItem(progressKey);
   renderFoodCards();
-  renderMap();
   hideChallenge();
+  if (state.leafletMap) {
+    state.leafletMap.remove();
+    state.leafletMap = null;
+  }
   openModal(`
     <h3>进度已重置</h3>
     <p>三个美食点位已恢复为未通关状态，地图图标会重新置灰。</p>
