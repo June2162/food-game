@@ -83,8 +83,6 @@ var cookState = {
 var _cookFoodSelect = document.getElementById('cookFoodSelect');
 var _cookingArea = document.getElementById('cookingArea');
 
-document.getElementById('cookTab').addEventListener('click', function() { switchView('cook'); });
-
 renderCookFoodSelect();
 
 function renderCookFoodSelect() {

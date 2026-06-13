@@ -2,31 +2,32 @@
   山海关乡土美食科普小游戏主逻辑
 */
 
-const foods = window.FOOD_GAME_DATA;
-const progressKey = 'qinhuangdao_food_game_unlocked';
+var foods = window.FOOD_GAME_DATA;
+var progressKey = 'qinhuangdao_food_game_unlocked';
 
-const state = {
+var state = {
   activeFoodId: null,
   currentStepIndex: 0,
   unlockedFoodIds: loadProgress(),
   leafletMap: null
 };
 
-const levelTab = document.getElementById('levelTab');
-const cookTab = document.getElementById('cookTab');
-const mapTab = document.getElementById('mapTab');
-const levelView = document.getElementById('levelView');
-const cookView = document.getElementById('cookView');
-const mapView = document.getElementById('mapView');
-const foodCards = document.getElementById('foodCards');
-const challengePanel = document.getElementById('challengePanel');
-const mapLegend = document.getElementById('mapLegend');
-const infoModal = document.getElementById('infoModal');
-const modalContent = document.getElementById('modalContent');
-const closeModalButton = document.getElementById('closeModalButton');
-const resetProgressButton = document.getElementById('resetProgressButton');
+var levelTab = document.getElementById('levelTab');
+var cookTab = document.getElementById('cookTab');
+var mapTab = document.getElementById('mapTab');
+var levelView = document.getElementById('levelView');
+var cookView = document.getElementById('cookView');
+var mapView = document.getElementById('mapView');
+var foodCards = document.getElementById('foodCards');
+var challengePanel = document.getElementById('challengePanel');
+var mapLegend = document.getElementById('mapLegend');
+var infoModal = document.getElementById('infoModal');
+var modalContent = document.getElementById('modalContent');
+var closeModalButton = document.getElementById('closeModalButton');
+var resetProgressButton = document.getElementById('resetProgressButton');
 
 levelTab.addEventListener('click', function() { switchView('level'); });
+cookTab.addEventListener('click', function() { switchView('cook'); });
 mapTab.addEventListener('click', function() { switchView('map'); });
 closeModalButton.addEventListener('click', closeModal);
 infoModal.querySelector('.modal-mask').addEventListener('click', closeModal);
