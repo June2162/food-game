@@ -4,90 +4,82 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="format-detection" content="telephone=no" />
-  <title>山海关乡土美食科普小游戏</title>
+  <title>非遗美食消消乐</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <main class="phone-shell">
-    <header class="hero-card">
-      <p class="eyebrow">大学生"三下乡"乡土文化宣传</p>
-      <h1>山海关乡土美食小课堂</h1>
-      <p class="hero-desc">认识桲椤叶饼、山海关冰糕、花生糕，在轻量闯关和地图浏览中了解秦皇岛地方小吃文化。</p>
+  <main class="phone-shell game-shell">
+    <header class="game-hero">
+      <div>
+        <p class="eyebrow">秦皇岛乡土非遗美食</p>
+        <h1>非遗美食消消乐</h1>
+        <p>闯关消除，收集桲椤叶饼、吕氏老冰糕、梨膏糖非遗美食卡牌。</p>
+      </div>
+      <button class="collection-button" type="button" onclick="openCardCollection()">卡牌库</button>
     </header>
 
-    <nav class="top-tabs three-tabs" aria-label="游戏模块切换">
-      <button id="levelTab" class="tab-button active" type="button">知识闯关</button>
-      <button id="cookTab" class="tab-button" type="button">互动制作</button>
-      <button id="mapTab" class="tab-button" type="button">美食地图</button>
+    <div class="corner-dock" aria-label="功能窗口">
+      <button type="button" onclick="openFeatureWindow('documentary')"><span>🎬</span>纪录片</button>
+      <button type="button" onclick="openFeatureWindow('steps')"><span>🧑‍🍳</span>制作</button>
+      <button type="button" onclick="openFeatureWindow('interview')"><span>🎙️</span>采访</button>
+      <button type="button" onclick="switchView('map')"><span>🗺️</span>地图</button>
+    </div>
+
+    <nav class="top-tabs four-tabs game-tabs" aria-label="模块切换">
+      <button id="cookTab" class="tab-button active" type="button">主游戏</button>
+      <button id="levelTab" class="tab-button" type="button">档案</button>
+      <button id="resultTab" class="tab-button" type="button">成果</button>
+      <button id="mapTab" class="tab-button" type="button">地图</button>
     </nav>
 
-    <section id="levelView" class="view active-view" aria-label="美食闯关模块">
-      <div class="section-title-row">
-        <div>
-          <p class="section-kicker">Food Challenge</p>
-          <h2>选择一种小吃开始闯关</h2>
-        </div>
-        <button id="resetProgressButton" class="text-button" type="button">重置进度</button>
-      </div>
-      <div id="foodCards" class="food-card-list"></div>
-      <article id="challengePanel" class="challenge-panel hidden"></article>
-    </section>
-
-    <section id="cookView" class="view" aria-label="互动制作模块">
-      <div class="section-title-row">
-        <div>
-          <p class="section-kicker">Interactive Cooking</p>
-          <h2>拖动食材体验制作</h2>
-        </div>
-      </div>
-      <p class="map-tip">选择一款美食，按正确顺序将食材拖动到制作台上，体验传统制作工艺。</p>
-      
+    <section id="cookView" class="view active-view" aria-label="非遗食材消消乐模块">
       <div id="cookFoodSelect" class="cook-food-select"></div>
-      
-      <div id="cookingArea" class="cooking-area hidden">
-        <div class="cooking-header">
-          <h3 id="cookingTitle">制作中...</h3>
-          <div id="cookingProgress" class="cooking-progress">步骤 1 / 4</div>
+      <div id="cookingArea" class="cooking-area stacked-game hidden">
+        <div class="cooking-header compact-header">
+          <div><h3 id="cookingTitle">第 1 关</h3><div id="cookingProgress" class="cooking-progress">准备开始</div></div>
+          <button class="text-button" type="button" onclick="backToMatchSelect()">选关</button>
         </div>
-        
-        <div class="cooking-instruction">
-          <p id="cookingInstruction">请将正确的食材拖到制作台上</p>
+        <div class="level-progress"><div id="levelProgressBar" class="level-progress-bar"></div></div>
+        <div id="comboBanner" class="combo-banner hidden"></div>
+        <div id="matchTargets" class="match-targets compact-targets"></div>
+        <div id="matchBoard" class="match-board stacked-board"></div>
+        <div class="slot-label">槽位 7 格：三个相同自动消除</div>
+        <div id="matchSlots" class="match-slots compact-slots"></div>
+        <div class="tool-row">
+          <button class="tool-button" type="button" onclick="shuffleBoard()">洗牌</button>
+          <button class="tool-button" type="button" onclick="undoPick()">撤回</button>
+          <button class="tool-button" type="button" onclick="restartMatch()">重开</button>
         </div>
-        
-        <div id="dropZone" class="drop-zone">
-          <div class="drop-zone-inner">
-            <span class="drop-icon">🍳</span>
-            <span class="drop-text">拖动食材到这里</span>
-          </div>
-        </div>
-        
-        <div id="ingredientList" class="ingredient-list"></div>
-        
         <div id="completedSteps" class="completed-steps"></div>
       </div>
     </section>
 
-    <section id="mapView" class="view" aria-label="美食地图模块">
-      <div class="section-title-row">
-        <div>
-          <p class="section-kicker">Food Map</p>
-          <h2>秦皇岛美食地图</h2>
-        </div>
+    <section id="levelView" class="view" aria-label="美食档案模块">
+      <div class="section-title-row"><div><p class="section-kicker">Food Archive</p><h2>非遗美食档案</h2></div><button id="resetProgressButton" class="text-button" type="button">重置</button></div>
+      <div id="foodCards" class="food-card-list"></div>
+      <article id="challengePanel" class="challenge-panel hidden"></article>
+    </section>
+
+    <section id="resultView" class="view" aria-label="实践成果模块">
+      <div class="section-title-row"><div><p class="section-kicker">Practice Results</p><h2>三下乡调研成果</h2></div></div>
+      <div class="result-grid">
+        <article class="result-card highlight"><strong>56.12%</strong><span>受访者对秦皇岛非遗美食基本没听过</span></article>
+        <article class="result-card"><strong>79.14%</strong><span>认为“知名度太低”是首要发展问题</span></article>
+        <article class="result-card"><strong>94.24%</strong><span>愿意体验非遗美食小程序或互动平台</span></article>
+        <article class="result-card"><strong>97.12%</strong><span>愿意购买或推荐非遗手作美食</span></article>
       </div>
-      <p class="map-tip">通过地图标注秦皇岛真实门店分布，点击标记可查看地址、电话和营业时间。未通关点位置灰，但仍可查看全部门店信息。</p>
+    </section>
+
+    <section id="mapView" class="view" aria-label="实地地图模块">
+      <div class="section-title-row"><div><p class="section-kicker">Field Map</p><h2>实地采访与美食点位</h2></div></div>
+      <p class="map-tip">地图将用于标注三下乡实地采访点、门店与工坊。后续可加入照片、采访摘要和视频入口。</p>
       <div id="realMap" class="real-map"></div>
       <div id="mapLegend" class="map-legend"></div>
     </section>
   </main>
 
-  <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-mask"></div>
-    <div class="modal-card">
-      <button id="closeModalButton" class="modal-close" type="button" aria-label="关闭弹窗">×</button>
-      <div id="modalContent"></div>
-    </div>
-  </div>
+  <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-mask"></div><div class="modal-card"><button id="closeModalButton" class="modal-close" type="button" aria-label="关闭弹窗">×</button><div id="modalContent"></div></div></div>
 
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
   <script src="./data.js"></script>

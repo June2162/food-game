@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>项目二维码生成器</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fff8ea, #f4dfbd);
+      font-family: "Microsoft YaHei", system-ui, sans-serif;
+      color: #3b2c22;
+    }
+    .container {
+      width: min(92vw, 420px);
+      background: #fff;
+      border-radius: 28px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 50px rgba(86, 48, 23, 0.12);
+      text-align: center;
+    }
+    h1 { font-size: 24px; margin: 0 0 8px; }
+    .desc { color: #806f5d; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e8d9c4;
+      border-radius: 14px;
+      font-size: 16px;
+      outline: none;
+    }
+    input:focus { border-color: #a7442b; }
+    button {
+      margin-top: 14px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 14px;
+      background: #a7442b;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button:hover { background: #7f2f1d; }
+    #qrResult { margin-top: 24px; display: none; }
+    #qrCanvas { border-radius: 16px; box-shadow: 0 8px 24px rgba(86, 48, 23, 0.1); }
+    .save-tip { margin-top: 12px; color: #806f5d; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>项目二维码生成器</h1>
+    <p class="desc">输入部署后的公网链接，生成微信可直接扫描打开的二维码。</p>
+    <input id="urlInput" type="url" value="https://june2162.github.io/food-game/" placeholder="https://你的项目地址" />
+    <button onclick="generateQR()">生成二维码</button>
+    <div id="qrResult">
+      <canvas id="qrCanvas"></canvas>
+      <p class="save-tip">右键画布 → 另存为图片，即可打印张贴。</p>
+    </div>
+  </div>
+  <script>
+    function generateQR() {
+      var url = document.getElementById('urlInput').value.trim();
+      if (!url || url.indexOf('http') !== 0) {
+        alert('请输入以 http:// 或 https:// 开头的链接');
+        return;
+      }
+      var canvas = document.getElementById('qrCanvas');
+      var size = 280;
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
+
+      var qr = generateQRMatrix(url);
+      var cellSize = Math.floor(size / (qr.length + 8));
+      var offset = Math.floor((size - cellSize * qr.length) / 2);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.fillStyle = '#a7442b';
+
+      for (var row = 0; row < qr.length; row++) {
+        for (var col = 0; col < qr[row].length; col++) {
+          if (qr[row][col]) {
+            ctx.fillRect(offset + col * cellSize, offset + row * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+
+      document.getElementById('qrResult').style.display = 'block';
+    }
+
+    function generateQRMatrix(text) {
+      var size = 0;
+      var version = 1;
+      for (version = 1; version <= 40; version++) {
+        var cap = getCapacity(version);
+        if (cap >= text.length) break;
+      }
+      size = version * 4 + 17;
+
+      var modules = [];
+      for (var i = 0; i < size; i++) {
+        modules[i] = [];
+        for (var j = 0; j < size; j++) {
+          modules[i][j] = false;
+        }
+      }
+
+      addFinderPattern(modules, 0, 0, size);
+      addFinderPattern(modules, size - 7, 0, size);
+      addFinderPattern(modules, 0, size - 7, size);
+      addTimingPatterns(modules, size);
+
+      var data = encodeData(text, version);
+      placeData(modules, data, size);
+
+      return modules;
+    }
+
+    function getCapacity(version) {
+      return Math.floor((version * 4 + 17) * (version * 4 + 17) * 0.6 / 8) - 2;
+    }
+
+    function addFinderPattern(modules, row, col, size) {
+      for (var r = 0; r < 7; r++) {
+        for (var c = 0; c < 7; c++) {
+          if (row + r < size && col + c < size) {
+            var isBlack = (r === 0 || r === 6 || c === 0 || c === 6 ||
+              (r >= 2 && r <= 4 && c >= 2 && c <= 4));
+            modules[row + r][col + c] = isBlack;
+          }
+        }
+      }
+    }
+
+    function addTimingPatterns(modules, size) {
+      for (var i = 8; i < size - 8; i++) {
+        modules[6][i] = (i % 2 === 0);
+        modules[i][6] = (i % 2 === 0);
+      }
+    }
+
+    function encodeData(text, version) {
+      var bits = [];
+      bits.push(0,1,0,0);
+      var len = text.length;
+      var lenBits = version <= 9 ? 8 : 16;
+      for (var i = lenBits - 1; i >= 0; i--) {
+        bits.push((len >> i) & 1);
+      }
+      for (var i = 0; i < text.length; i++) {
+        var code = text.charCodeAt(i);
+        for (var b = 7; b >= 0; b--) {
+          bits.push((code >> b) & 1);
+        }
+      }
+      return bits;
+    }
+
+    function placeData(modules, data, size) {
+      var idx = 0;
+      var upward = true;
+      for (var col = size - 1; col >= 1; col -= 2) {
+        if (col === 6) col = 5;
+        var rows = upward ? range(size - 1, -1) : range(0, size);
+        for (var ri = 0; ri < rows.length; ri++) {
+          var row = rows[ri];
+          for (var c = 0; c < 2; c++) {
+            var curCol = col - c;
+            if (curCol < 0 || curCol >= size) continue;
+            if (isReserved(row, curCol, size)) continue;
+            if (idx < data.length) {
+              modules[row][curCol] = data[idx] === 1;
+              idx++;
+            } else {
+              modules[row][curCol] = ((row + curCol) % 2 === 0);
+            }
+          }
+        }
+        upward = !upward;
+      }
+    }
+
+    function isReserved(row, col, size) {
+      if (row < 9 && col < 9) return true;
+      if (row < 9 && col >= size - 8) return true;
+      if (row >= size - 8 && col < 9) return true;
+      if (row === 6 || col === 6) return true;
+      return false;
+    }
+
+    function range(start, end) {
+      var arr = [];
+      if (start < end) {
+        for (var i = start; i < end; i++) arr.push(i);
+      } else {
+        for (var i = start; i >= end + 1; i--) arr.push(i);
+      }
+      return arr;
+    }
+  </script>
+</body>
+</html>

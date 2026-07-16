@@ -1,293 +1,40 @@
-/*
-  互动制作模块 - 拖动食材体验制作过程
-  支持触屏拖拽（手机端）和鼠标拖拽（电脑端）
-*/
-
-var COOK_DATA = [
-  {
-    id: 'boluoye',
-    name: '桲椤叶饼',
-    emoji: '🥟',
-    desc: '体验桲椤叶饼的传统制作工艺',
-    steps: [
-      { instruction: '第一步：清洗桲椤叶，去除杂质让叶片柔软', correctIngredient: 'leaf', resultText: '桲椤叶清洗干净了，散发着淡淡清香', resultEmoji: '🌿' },
-      { instruction: '第二步：调制玉米面糊，搅拌均匀', correctIngredient: 'flour', resultText: '面糊调好了，稀稠适中', resultEmoji: '🫗' },
-      { instruction: '第三步：准备韭菜鸡蛋馅料，切碎拌匀', correctIngredient: 'filling', resultText: '馅料拌好了，韭菜鸡蛋香气扑鼻', resultEmoji: '🥬' },
-      { instruction: '第四步：将面糊和馅料放在桲椤叶上包合', correctIngredient: 'wrap', resultText: '包好了！叶片裹住了面糊和馅料', resultEmoji: '🫔' },
-      { instruction: '第五步：放入蒸锅，大火蒸15分钟', correctIngredient: 'steam', resultText: '蒸熟了！桲椤叶饼散发着叶香和面香', resultEmoji: '♨️' }
-    ],
-    ingredients: [
-      { id: 'leaf', emoji: '🍃', name: '桲椤叶' },
-      { id: 'flour', emoji: '🌾', name: '玉米面' },
-      { id: 'filling', emoji: '🥚', name: '韭菜鸡蛋' },
-      { id: 'wrap', emoji: '🤲', name: '包合' },
-      { id: 'steam', emoji: '🔥', name: '上蒸锅' },
-      { id: 'oil', emoji: '🫒', name: '食用油' },
-      { id: 'ice', emoji: '🧊', name: '冰块' }
-    ]
-  },
-  {
-    id: 'icecream',
-    name: '山海关冰糕',
-    emoji: '🍦',
-    desc: '体验老城冰糕的制作过程',
-    steps: [
-      { instruction: '第一步：准备新鲜牛奶和白砂糖', correctIngredient: 'milk', resultText: '牛奶和糖准备好了', resultEmoji: '🥛' },
-      { instruction: '第二步：加热搅拌让糖完全溶解', correctIngredient: 'heat', resultText: '糖已经完全溶解在牛奶里了', resultEmoji: '🫕' },
-      { instruction: '第三步：加入果味配料增加风味', correctIngredient: 'fruit', resultText: '加入了果味配料，颜色变得好看了', resultEmoji: '🍓' },
-      { instruction: '第四步：倒入冰糕模具定型', correctIngredient: 'mold', resultText: '液体倒入模具，形状整齐', resultEmoji: '🧊' },
-      { instruction: '第五步：放入冰柜冷冻成型', correctIngredient: 'freeze', resultText: '冰糕冻好了！清凉甜蜜', resultEmoji: '🍨' }
-    ],
-    ingredients: [
-      { id: 'milk', emoji: '🥛', name: '牛奶+糖' },
-      { id: 'heat', emoji: '🔥', name: '加热搅拌' },
-      { id: 'fruit', emoji: '🍓', name: '果味配料' },
-      { id: 'mold', emoji: '🧊', name: '倒入模具' },
-      { id: 'freeze', emoji: '❄️', name: '冷冻成型' },
-      { id: 'salt', emoji: '🧂', name: '盐巴' },
-      { id: 'chili', emoji: '🌶️', name: '辣椒' }
-    ]
-  },
-  {
-    id: 'peanutcake',
-    name: '花生糕',
-    emoji: '🥜',
-    desc: '体验古城花生糕的手工制作',
-    steps: [
-      { instruction: '第一步：挑选饱满花生，去壳备用', correctIngredient: 'select', resultText: '花生挑选好了，颗颗饱满', resultEmoji: '🥜' },
-      { instruction: '第二步：下锅炒香，翻炒至金黄', correctIngredient: 'roast', resultText: '花生炒香了，满屋飘香', resultEmoji: '🍳' },
-      { instruction: '第三步：去皮研磨成花生碎', correctIngredient: 'grind', resultText: '花生碎磨好了，细腻均匀', resultEmoji: '🫗' },
-      { instruction: '第四步：熬制糖浆至拉丝状态', correctIngredient: 'syrup', resultText: '糖浆熬好了，色泽金黄可以拉丝', resultEmoji: '🍯' },
-      { instruction: '第五步：花生碎与糖浆混合，压模整形', correctIngredient: 'press', resultText: '压模成型了！花生糕形状整齐漂亮', resultEmoji: '🧱' },
-      { instruction: '第六步：冷却后切块包装', correctIngredient: 'cut', resultText: '花生糕做好了！酥脆香甜，入口即化', resultEmoji: '🎁' }
-    ],
-    ingredients: [
-      { id: 'select', emoji: '🥜', name: '挑选花生' },
-      { id: 'roast', emoji: '🍳', name: '炒香' },
-      { id: 'grind', emoji: '⚙️', name: '研磨' },
-      { id: 'syrup', emoji: '🍯', name: '熬糖浆' },
-      { id: 'press', emoji: '🤜', name: '压模整形' },
-      { id: 'cut', emoji: '🔪', name: '切块包装' },
-      { id: 'water', emoji: '💧', name: '清水' },
-      { id: 'leaf2', emoji: '🍃', name: '树叶' }
-    ]
-  }
+/* 非遗美食消消乐：默认进入闯关、108张成组发牌、图标卡面、通关收藏卡 */
+var MATCH_LEVELS=[
+{id:'boluoye',title:'第 1 关：桲椤叶饼',emoji:'🥟',foodId:'boluoye',cardName:'山野叶香·桲椤叶饼',rarity:'乡土记忆卡',story:'叶片包裹面香与馅香，是秦皇岛乡土蒸食中极有辨识度的味道。',icons:[['leaf','🍃'],['flour','🌾'],['filling','🥬'],['steam','♨️'],['salt','🧂'],['bowl','🥣'],['fire','🔥'],['hand','🤲'],['water','💧']]},
+{id:'lvshi_ice',title:'第 2 关：吕氏老冰糕',emoji:'🍦',foodId:'lvshi_ice',cardName:'老城清凉·吕氏老冰糕',rarity:'夏日记忆卡',story:'老冰糕是山海关街巷里的清凉回忆，适合用年轻化小游戏重新传播。',icons:[['milk','🥛'],['sugar','🍬'],['mix','🥄'],['mold','🧊'],['freeze','❄️'],['pack','🎁'],['fruit','🍓'],['cold','🌬️'],['shop','🏠']]},
+{id:'ligao_tang',title:'第 3 关：梨膏糖',emoji:'🍐',foodId:'ligao_tang',cardName:'清润梨香·梨膏糖',rarity:'传统糖点卡',story:'梨汁经过熬制凝成糖点，火候、香气和成型过程都适合做成影像展示。',icons:[['pear','🍐'],['sugar','🍬'],['boil','🔥'],['pot','🍯'],['cool','🧊'],['cut','🔪'],['box','🎁'],['spoon','🥄'],['star','✨']]}
 ];
-
-var cookState = {
-  activeFoodId: null,
-  currentStep: 0,
-  draggedItem: null
-};
-
-var _cookFoodSelect = document.getElementById('cookFoodSelect');
-var _cookingArea = document.getElementById('cookingArea');
-
-renderCookFoodSelect();
-
-function renderCookFoodSelect() {
-  _cookFoodSelect.innerHTML = COOK_DATA.map(function(food) {
-    return '<button class="cook-food-btn" onclick="startCooking(\'' + food.id + '\')">'
-      + '<span class="emoji">' + food.emoji + '</span>'
-      + '<div class="info"><h4>' + food.name + '</h4><p>' + food.desc + '</p></div>'
-      + '</button>';
-  }).join('');
-}
-
-function startCooking(foodId) {
-  cookState.activeFoodId = foodId;
-  cookState.currentStep = 0;
-  _cookFoodSelect.classList.add('hidden');
-  _cookingArea.classList.remove('hidden');
-  renderCookingStep();
-}
-
-function renderCookingStep() {
-  var food = COOK_DATA.find(function(f) { return f.id === cookState.activeFoodId; });
-  if (!food) return;
-
-  var step = food.steps[cookState.currentStep];
-  var total = food.steps.length;
-
-  document.getElementById('cookingTitle').textContent = food.name + '制作';
-  document.getElementById('cookingProgress').textContent = '步骤 ' + (cookState.currentStep + 1) + ' / ' + total;
-  document.getElementById('cookingInstruction').textContent = step.instruction;
-
-  var dropZone = document.getElementById('dropZone');
-  dropZone.className = 'drop-zone';
-  dropZone.innerHTML = '<div class="drop-zone-inner"><span class="drop-icon">🍳</span><span class="drop-text">拖动食材到这里</span></div>';
-
-  var shuffled = food.ingredients.slice().sort(function() { return Math.random() - 0.5; });
-  var ingredientList = document.getElementById('ingredientList');
-  ingredientList.innerHTML = shuffled.map(function(ing) {
-    var usedSteps = food.steps.slice(0, cookState.currentStep);
-    var isUsed = usedSteps.some(function(s) { return s.correctIngredient === ing.id; });
-    return '<div class="ingredient-item' + (isUsed ? ' used' : '') + '" data-id="' + ing.id + '" draggable="true">'
-      + '<span class="emoji">' + ing.emoji + '</span>'
-      + '<span class="name">' + ing.name + '</span>'
-      + '</div>';
-  }).join('');
-
-  renderCompletedSteps(food);
-  bindDragEvents();
-}
-
-function renderCompletedSteps(food) {
-  var container = document.getElementById('completedSteps');
-  if (cookState.currentStep === 0) { container.innerHTML = ''; return; }
-  var html = '';
-  for (var i = 0; i < cookState.currentStep; i++) {
-    html += '<div class="completed-step"><span class="check">' + food.steps[i].resultEmoji + '</span><span class="step-text">' + food.steps[i].resultText + '</span></div>';
-  }
-  container.innerHTML = html;
-}
-
-function bindDragEvents() {
-  var items = document.querySelectorAll('.ingredient-item:not(.used)');
-  var dropZone = document.getElementById('dropZone');
-
-  items.forEach(function(item) {
-    item.addEventListener('dragstart', handleDragStart);
-    item.addEventListener('dragend', handleDragEnd);
-    item.addEventListener('touchstart', handleTouchStart, { passive: false });
-    item.addEventListener('touchmove', handleTouchMove, { passive: false });
-    item.addEventListener('touchend', handleTouchEnd);
-  });
-
-  dropZone.addEventListener('dragover', handleDragOver);
-  dropZone.addEventListener('dragleave', handleDragLeave);
-  dropZone.addEventListener('drop', handleDrop);
-}
-
-function handleDragStart(e) {
-  cookState.draggedItem = e.target.closest('.ingredient-item');
-  cookState.draggedItem.classList.add('dragging');
-  e.dataTransfer.setData('text/plain', cookState.draggedItem.dataset.id);
-}
-
-function handleDragEnd(e) {
-  if (cookState.draggedItem) cookState.draggedItem.classList.remove('dragging');
-}
-
-function handleDragOver(e) {
-  e.preventDefault();
-  e.currentTarget.classList.add('drag-over');
-}
-
-function handleDragLeave(e) {
-  e.currentTarget.classList.remove('drag-over');
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  e.currentTarget.classList.remove('drag-over');
-  var ingredientId = e.dataTransfer.getData('text/plain');
-  checkIngredient(ingredientId);
-}
-
-var touchClone = null;
-
-function handleTouchStart(e) {
-  e.preventDefault();
-  var item = e.target.closest('.ingredient-item');
-  if (!item || item.classList.contains('used')) return;
-
-  cookState.draggedItem = item;
-  item.classList.add('dragging');
-
-  var touch = e.touches[0];
-  touchClone = item.cloneNode(true);
-  touchClone.style.position = 'fixed';
-  touchClone.style.zIndex = '9999';
-  touchClone.style.pointerEvents = 'none';
-  touchClone.style.opacity = '0.85';
-  touchClone.style.transform = 'scale(1.1)';
-  touchClone.style.left = (touch.clientX - 30) + 'px';
-  touchClone.style.top = (touch.clientY - 30) + 'px';
-  document.body.appendChild(touchClone);
-}
-
-function handleTouchMove(e) {
-  e.preventDefault();
-  if (!touchClone) return;
-
-  var touch = e.touches[0];
-  touchClone.style.left = (touch.clientX - 30) + 'px';
-  touchClone.style.top = (touch.clientY - 30) + 'px';
-
-  var dropZone = document.getElementById('dropZone');
-  var rect = dropZone.getBoundingClientRect();
-  var isOver = touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom;
-  dropZone.classList.toggle('drag-over', isOver);
-}
-
-function handleTouchEnd(e) {
-  if (!cookState.draggedItem) return;
-
-  var dropZone = document.getElementById('dropZone');
-  dropZone.classList.remove('drag-over');
-
-  if (touchClone) {
-    var touch = e.changedTouches[0];
-    var rect = dropZone.getBoundingClientRect();
-    var isOver = touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom;
-
-    if (isOver) {
-      checkIngredient(cookState.draggedItem.dataset.id);
-    }
-
-    document.body.removeChild(touchClone);
-    touchClone = null;
-  }
-
-  cookState.draggedItem.classList.remove('dragging');
-  cookState.draggedItem = null;
-}
-
-function checkIngredient(ingredientId) {
-  var food = COOK_DATA.find(function(f) { return f.id === cookState.activeFoodId; });
-  var step = food.steps[cookState.currentStep];
-  var dropZone = document.getElementById('dropZone');
-
-  if (ingredientId === step.correctIngredient) {
-    dropZone.className = 'drop-zone correct';
-    dropZone.innerHTML = '<div class="drop-zone-inner"><span class="drop-icon">' + step.resultEmoji + '</span><span class="drop-text">' + step.resultText + '</span></div>';
-
-    setTimeout(function() {
-      cookState.currentStep++;
-      if (cookState.currentStep >= food.steps.length) {
-        finishCooking(food);
-      } else {
-        renderCookingStep();
-      }
-    }, 1200);
-  } else {
-    dropZone.className = 'drop-zone wrong';
-    dropZone.innerHTML = '<div class="drop-zone-inner"><span class="drop-icon">❌</span><span class="drop-text">这不是当前步骤需要的，再想想</span></div>';
-
-    setTimeout(function() {
-      dropZone.className = 'drop-zone';
-      dropZone.innerHTML = '<div class="drop-zone-inner"><span class="drop-icon">🍳</span><span class="drop-text">拖动食材到这里</span></div>';
-    }, 1000);
-  }
-}
-
-function finishCooking(food) {
-  _cookingArea.innerHTML = '<div style="text-align:center;padding:30px 0;">'
-    + '<div style="font-size:64px;margin-bottom:16px;">' + food.emoji + '</div>'
-    + '<h3 style="font-size:24px;margin:0 0 12px;">' + food.name + '制作完成！</h3>'
-    + '<p style="color:#806f5d;font-size:15px;line-height:1.6;margin:0 0 20px;">恭喜你完成了' + food.name + '的全部制作流程，<br>现在你已经了解了这道非遗美食的传统工艺。</p>'
-    + '<div class="completed-steps" style="text-align:left;margin-bottom:20px;">'
-    + food.steps.map(function(s) { return '<div class="completed-step"><span class="check">' + s.resultEmoji + '</span><span class="step-text">' + s.resultText + '</span></div>'; }).join('')
-    + '</div>'
-    + '<button class="primary-button" onclick="backToCookSelect()">制作其他美食</button>'
-    + '</div>';
-}
-
-function backToCookSelect() {
-  cookState.activeFoodId = null;
-  cookState.currentStep = 0;
-  _cookingArea.classList.add('hidden');
-  _cookingArea.innerHTML = '<div class="cooking-header"><h3 id="cookingTitle">制作中...</h3><div id="cookingProgress" class="cooking-progress">步骤 1 / 4</div></div><div class="cooking-instruction"><p id="cookingInstruction">请将正确的食材拖到制作台上</p></div><div id="dropZone" class="drop-zone"><div class="drop-zone-inner"><span class="drop-icon">🍳</span><span class="drop-text">拖动食材到这里</span></div></div><div id="ingredientList" class="ingredient-list"></div><div id="completedSteps" class="completed-steps"></div>';
-  _cookFoodSelect.classList.remove('hidden');
-}
+MATCH_LEVELS.forEach(function(l){l.icons=l.icons.map(function(i){return{id:i[0],emoji:i[1]};});});
+var cardCollectionKey='heritage_food_card_collection';
+var matchState={levelIndex:0,level:null,cards:[],slots:[],removedCount:0,score:0,locked:false,shuffleLeft:2,undoLeft:3,combo:0,lastEliminateAt:0};
+var _cookFoodSelect=document.getElementById('cookFoodSelect'),_cookingArea=document.getElementById('cookingArea');
+startMatchLevel(getCurrentLevelIndex());
+function getCurrentLevelIndex(){for(var i=MATCH_LEVELS.length-1;i>0;i--){if(localStorage.getItem('match_level_'+i)==='unlocked')return i;}return 0;}
+function renderLevelSelect(){var got=loadCollectedCards();_cookFoodSelect.innerHTML='<div class="game-start-panel"><h2>选择关卡</h2><p>通关获得精美非遗美食卡牌。</p></div>'+MATCH_LEVELS.map(function(l,i){var u=i===0||localStorage.getItem('match_level_'+i)==='unlocked',own=got.indexOf(l.id)!==-1;return '<button class="cook-food-btn level-entry '+(u?'':'locked-level')+'" '+(u?'onclick="startMatchLevel('+i+')"':'')+'><span class="emoji">'+l.emoji+'</span><div class="info"><h4>'+l.title+'</h4><p>'+(u?'点击进入闯关':'通关上一关后解锁')+'</p></div><strong class="card-badge">'+(own?'已收集':'待收集')+'</strong></button>';}).join('');}
+function startMatchLevel(i){var l=MATCH_LEVELS[i];matchState={levelIndex:i,level:l,cards:buildStackedCards(l),slots:[],removedCount:0,score:0,locked:false,shuffleLeft:2,undoLeft:3,combo:0,lastEliminateAt:0};_cookFoodSelect.classList.add('hidden');_cookingArea.classList.remove('hidden');renderMatchGame();showComboBanner('开始挑战','ready');}
+function buildStackedCards(l){var pos=buildPositions(),cards=[],icons=[];for(var g=0;g<36;g++){icons.push(l.icons[g%l.icons.length]);}icons=shuffle(icons);icons.forEach(function(ic,group){for(var k=0;k<3;k++){var p=pos[group*3+k];cards.push(makeCard(ic,group*3+k,p.layer,p.x,p.y));}});return cards.map(function(c,i){c.z=c.layer*100+i;return c;});}
+function buildPositions(){var arr=[],layout=[{layer:0,rows:6,cols:6,x:14,y:18},{layer:1,rows:6,cols:6,x:32,y:34},{layer:2,rows:5,cols:5,x:50,y:54},{layer:3,rows:3,cols:3,x:96,y:82},{layer:4,rows:1,cols:2,x:142,y:130}];layout.forEach(function(g){for(var r=0;r<g.rows;r++)for(var c=0;c<g.cols;c++)arr.push({layer:g.layer,x:g.x+c*46,y:g.y+r*37});});return shuffle(arr.slice(0,108));}
+function makeCard(ic,i,layer,x,y){return{id:ic.id,emoji:ic.emoji,uid:ic.id+'_'+i+'_'+Math.random().toString(36).slice(2,7),layer:layer,x:x,y:y,z:0,removed:false,picked:false};}
+function shuffle(a){return a.sort(function(){return Math.random()-.5;});}
+function renderMatchGame(){var total=matchState.cards.length,p=Math.round(matchState.removedCount/total*100);document.getElementById('cookingTitle').textContent=matchState.level.title;document.getElementById('cookingProgress').textContent='进度 '+p+'% · 得分 '+matchState.score+' · 连消 '+matchState.combo;document.getElementById('levelProgressBar').style.width=p+'%';renderTargets();renderBoard();renderSlots();renderTip();}
+function renderTargets(){document.getElementById('matchTargets').innerHTML='<div class="mini-rule">第 '+(matchState.levelIndex+1)+' / '+MATCH_LEVELS.length+' 关</div><div class="mini-rule">洗牌 '+matchState.shuffleLeft+'</div><div class="mini-rule">撤回 '+matchState.undoLeft+'</div><div class="mini-rule">槽位 '+matchState.slots.length+'/7</div>';}
+function renderBoard(){var s=matchState.cards.slice().sort(function(a,b){return a.z-b.z;});document.getElementById('matchBoard').innerHTML=s.map(function(c){if(c.removed||c.picked)return'';var b=isBlocked(c);return '<button class="stack-card icon-only '+(b?'blocked':'')+'" style="left:'+c.x+'px;top:'+c.y+'px;z-index:'+c.z+';" onclick="pickCard(\''+c.uid+'\')"><span>'+c.emoji+'</span></button>';}).join('');}
+function isBlocked(c){return matchState.cards.some(function(o){return o.uid!==c.uid&&!o.removed&&!o.picked&&o.layer>c.layer&&Math.abs(o.x-c.x)<38&&Math.abs(o.y-c.y)<32;});}
+function renderSlots(){var h='';for(var i=0;i<7;i++){var c=matchState.slots[i];h+='<div class="match-slot '+(c?'filled slot-pop':'')+'">'+(c?'<span>'+c.emoji+'</span>':'')+'</div>';}document.getElementById('matchSlots').innerHTML=h;}
+function renderTip(m){document.getElementById('completedSteps').innerHTML='<div class="match-tip">'+(m||'灰色卡片被上层压住，不能点击。连续快速消除会触发连消加分。')+'</div>';}
+function pickCard(uid){if(matchState.locked)return;var c=matchState.cards.find(function(x){return x.uid===uid;});if(!c||c.removed||c.picked)return;if(isBlocked(c)){shakeBoard();renderTip('这张卡被上层压住了，先消除覆盖它的卡片。');return;}if(matchState.slots.length>=7){loseMatch('槽位已满，挑战失败！');return;}c.picked=true;matchState.slots.push(c);floatText(c.emoji,c.x,c.y);var e=eliminateTriples(c.id);if(!e&&matchState.slots.length>=7){renderMatchGame();loseMatch('槽位已满，挑战失败！');return;}renderMatchGame();if(e)renderTip('三连消除！底层又露出来一些。');if(matchState.removedCount>=matchState.cards.length)winMatch();}
+function eliminateTriples(id){var same=matchState.slots.filter(function(c){return c.id===id;});if(same.length<3)return false;var now=Date.now();matchState.combo=now-matchState.lastEliminateAt<2600?matchState.combo+1:1;matchState.lastEliminateAt=now;var rm=0,emoji=same[0].emoji;matchState.slots=matchState.slots.filter(function(c){if(c.id===id&&rm<3){c.removed=true;c.picked=false;rm++;matchState.removedCount++;return false;}return true;});var bonus=100+Math.max(0,matchState.combo-1)*50;matchState.score+=bonus;showComboBanner(matchState.combo>1?'连消 x'+matchState.combo+' +'+bonus:'三消 +'+bonus,'combo');burst(emoji);return true;}
+function shuffleBoard(){if(matchState.locked||matchState.shuffleLeft<=0)return;matchState.shuffleLeft--;var active=matchState.cards.filter(function(c){return!c.removed&&!c.picked;}),pos=shuffle(active.map(function(c){return{x:c.x,y:c.y,layer:c.layer,z:c.z};}));active.forEach(function(c,i){c.x=pos[i].x;c.y=pos[i].y;c.layer=pos[i].layer;c.z=pos[i].z;});renderMatchGame();showComboBanner('洗牌完成','ready');}
+function undoPick(){if(matchState.locked||matchState.undoLeft<=0||!matchState.slots.length)return;var c=matchState.slots.pop();c.picked=false;matchState.undoLeft--;renderMatchGame();showComboBanner('撤回成功','ready');}
+function winMatch(){matchState.locked=true;collectCard(matchState.level.id);if(typeof unlockFood==='function')unlockFood(matchState.level.foodId);if(typeof renderFoodCards==='function')renderFoodCards();var n=matchState.levelIndex+1;if(n<MATCH_LEVELS.length)localStorage.setItem('match_level_'+n,'unlocked');confetti();var html='<div class="premium-reward"><p class="reward-kicker">卡牌已收集</p><div class="premium-card"><div class="card-shine"></div><div class="premium-img">'+matchState.level.emoji+'</div><h2>'+matchState.level.cardName+'</h2><strong>'+matchState.level.rarity+'</strong><p>'+matchState.level.story+'</p><span>后续可替换为你的实拍美食图片</span></div><button class="primary-button" onclick="closeModal();backToMatchSelect()">继续闯关</button><button class="small-button" onclick="openCardCollection()">查看卡牌库</button></div>';if(typeof openModal==='function')openModal(html);document.getElementById('completedSteps').innerHTML='<div class="match-tip">通关成功！非遗美食卡牌已加入收集库。</div>';}
+function loseMatch(m){matchState.locked=true;shakeBoard();document.getElementById('completedSteps').innerHTML='<div class="match-finish lose"><div class="finish-emoji">😵</div><h3>挑战失败</h3><p>'+m+'</p><button class="primary-button" onclick="restartMatch()">再试一次</button><button class="small-button" onclick="backToMatchSelect()">返回关卡</button></div>';}
+function restartMatch(){if(matchState.level)startMatchLevel(matchState.levelIndex);}function backToMatchSelect(){matchState.level=null;matchState.cards=[];matchState.slots=[];matchState.removedCount=0;matchState.score=0;matchState.locked=false;_cookingArea.classList.add('hidden');_cookFoodSelect.classList.remove('hidden');renderLevelSelect();}
+function collectCard(id){var a=loadCollectedCards();if(a.indexOf(id)===-1){a.push(id);localStorage.setItem(cardCollectionKey,JSON.stringify(a));}}
+function loadCollectedCards(){try{return JSON.parse(localStorage.getItem(cardCollectionKey))||[];}catch(e){return[];}}
+function openCardCollection(){var got=loadCollectedCards(),html='<h3>非遗美食卡牌收集库</h3><p>通关主游戏后可获得对应卡牌。</p><div class="card-library">'+MATCH_LEVELS.map(function(l){var o=got.indexOf(l.id)!==-1;return '<div class="library-card '+(o?'owned':'locked')+'"><div class="card-emoji">'+(o?l.emoji:'❔')+'</div><strong>'+(o?l.cardName:'未解锁卡牌')+'</strong><span>'+(o?l.rarity:'继续闯关获得')+'</span><small>'+(o?l.story:'通关 '+l.title+' 后解锁')+'</small></div>';}).join('')+'</div>';if(typeof openModal==='function')openModal(html);}
+function openFeatureWindow(t){var d={documentary:['🎬','纪录片窗口','这里后续放三下乡纪录片、调研短片或非遗美食宣传视频。'],steps:['🧑‍🍳','制作步骤窗口','这里展示桲椤叶饼、吕氏老冰糕、梨膏糖的图文制作步骤。'],interview:['🎙️','传承人采访窗口','这里放店主、师傅、传承人采访语录、照片和音视频片段。']}[t];if(d&&typeof openModal==='function')openModal('<div class="feature-window"><div class="feature-icon">'+d[0]+'</div><h3>'+d[1]+'</h3><p>'+d[2]+'</p><div class="media-slot">素材待接入</div></div>');}
+function showComboBanner(t,cls){var b=document.getElementById('comboBanner');if(!b)return;b.textContent=t;b.className='combo-banner '+(cls||'combo');setTimeout(function(){b.classList.add('hidden');},950);}
+function floatText(t,x,y){var b=document.getElementById('matchBoard');if(!b)return;var e=document.createElement('div');e.className='floating-score';e.textContent=t;e.style.left=x+'px';e.style.top=y+'px';b.appendChild(e);setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e);},700);}
+function burst(emoji){var b=document.getElementById('matchBoard');if(!b)return;for(var i=0;i<12;i++){var p=document.createElement('div');p.className='burst-particle';p.textContent=i%3===0?emoji:'✨';p.style.left=145+Math.random()*80+'px';p.style.top=120+Math.random()*70+'px';p.style.setProperty('--dx',Math.random()*120-60+'px');p.style.setProperty('--dy',Math.random()*-90-20+'px');b.appendChild(p);setTimeout((function(x){return function(){if(x.parentNode)x.parentNode.removeChild(x);};})(p),850);}}
+function confetti(){for(var i=0;i<28;i++){var c=document.createElement('div');c.className='win-confetti';c.textContent=['✨','🎉','⭐','🏮'][i%4];c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*.4+'s';document.body.appendChild(c);setTimeout((function(x){return function(){if(x.parentNode)x.parentNode.removeChild(x);};})(c),1800);}}
+function shakeBoard(){var b=document.getElementById('matchBoard');if(!b)return;b.classList.add('board-shake');setTimeout(function(){b.classList.remove('board-shake');},350);}

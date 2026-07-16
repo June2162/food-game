@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>秦皇岛非遗美食小游戏 - 二维码</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fff8ea, #f4dfbd);
+      font-family: "Microsoft YaHei", sans-serif;
+      color: #3b2c22;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(86, 48, 23, 0.15);
+      text-align: center;
+      max-width: 400px;
+    }
+    h1 {
+      font-size: 24px;
+      margin: 0 0 8px;
+      color: #a7442b;
+    }
+    .subtitle {
+      color: #806f5d;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .qr-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      display: inline-block;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .qr-container img {
+      display: block;
+      width: 200px;
+      height: 200px;
+    }
+    .url {
+      margin-top: 20px;
+      padding: 12px 16px;
+      background: #fff6df;
+      border-radius: 12px;
+      font-size: 12px;
+      word-break: break-all;
+      color: #806f5d;
+    }
+    .tip {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #806f5d;
+      line-height: 1.6;
+    }
+    .print-btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: #a7442b;
+      color: #fff;
+      border: none;
+      border-radius: 99px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .print-btn:hover {
+      background: #7f2f1d;
+    }
+    @media print {
+      body { background: #fff; }
+      .print-btn { display: none; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>山海关乡土美食小课堂</h1>
+    <p class="subtitle">大学生"三下乡"乡土文化宣传</p>
+    
+    <div class="qr-container">
+      <!-- 使用 QR Server API 生成二维码 -->
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://june2162.github.io/food-game/" alt="扫码体验小游戏">
+    </div>
+    
+    <div class="url">https://june2162.github.io/food-game/</div>
+    
+    <p class="tip">
+      微信/QQ/浏览器扫码即可体验<br>
+      了解桲椤叶饼、山海关冰糕、花生糕的制作工艺<br>
+      查看13家正宗门店地址和电话
+    </p>
+    
+    <button class="print-btn" onclick="window.print()">打印此页</button>
+  </div>
+</body>
+</html>
